@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhg.javakc.modules.myorgtree.dao.OrgDao">
+	
+	<resultMap id="orgMap" type="org">
+		<id property="orgId" column="org_id"/>
+		<result property="orgName" column="org_name"/>
+		<result property="orgParentId" column="org_parent_id"/>
+		<result property="orgOpen" column="org_open"/>
+		<result property="orgLevel" column="org_level"/>
+		<result property="orgOrder " column="org_order "/>
+	</resultMap>
+	
+	<!-- 机构树查询方法 -->
+	<select id="findAllOrg" resultType="java.util.HashMap">
+		select  org_id "id",
+				org_name "name",
+				org_parent_id "pId",
+				decode(org_open,0,'false',1,'true') "open",
+				org_level "orgLevel"
+		from data_org where 1=1
+		order by org_order asc
+	</select>
+	
+	<!-- 机构树修改查询方法 -->
+	<select id="findOrg" resultMap="orgMap">
+		select org_id,org_name,org_parent_id,org_open,org_level,org_order from data_org
+		<where>
+				and org_id = #{id}
+		</where>
+	</select>
+	
+	<!-- 添加节点 -->
+	<insert id="insert">
+		insert into data_org(org_id,org_name,org_parent_id,org_open,org_level,org_order,createUser,createDate)
+			values(#{orgId},#{orgName},#{orgParentId},#{orgOpen},#{orgLevel},#{orgOrder},#{createUser.userId},#{createDate})
+	</insert>
+	
+	<!-- 删除节点 -->
+	<delete id="delete">
+		{call delete_org
+		(
+			#{orgId,mode=IN,jdbcType=VARCHAR}
+		)}
+	</delete>
+	
+	<!-- 修改节点 -->
+	<update id="update">
+		update data_org set org_name=#{orgName},org_parent_id=#{orgParentId},org_open=#{orgOpen},org_level=#{orgLevel},
+			org_order=#{orgOrder},updateUser=#{updateUser.userId},updateDate=#{createDate}
+				where org_id=#{orgId}
+		
+	</update>
+</mapper>

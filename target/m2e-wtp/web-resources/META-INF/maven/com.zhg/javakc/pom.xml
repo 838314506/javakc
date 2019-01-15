@@ -1,0 +1,384 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+  		http://maven.apache.org/maven-v4_0_0.xsd">
+  
+	<!-- 指定了当前POM模型的版本, maven2,3必须使用 4.0.0 -->
+  	<modelVersion>4.0.0</modelVersion>
+  	<!-- 定义了项目属于哪个组，这个组和项目所在的组织或公司存在关联 -->
+  	<groupId>com.zhg</groupId>
+  	<!-- 项目ID -->
+  	<artifactId>javakc</artifactId>
+  	<!-- 定义项目打包结构 -->
+  	<packaging>war</packaging>
+  	<!-- SNAPSHOT意为快照，说明该项目还处于开发中 -->
+  	<version>0.0.5-SNAPSHOT</version>
+  	<!-- 声明了一个对于用户更为友好的项目名称 -->
+  	<name>javakc</name>
+  	<!--项目主页的URL, Maven产生的文档用-->
+  	<url>http://www.javakc.com</url>
+  	
+  	<!--项目开发者列表-->     
+    <developers>     
+     <!--某个项目开发者的信息-->    
+        <developer>     
+            <id>zhg</id>     
+            <!--项目开发者的全名-->    
+            <name>zhg</name>     
+            <!--项目开发者的email-->    
+            <email>honggang_z@163.com</email>     
+            <!--项目开发者所属组织-->    
+            <organization>javakc</organization>     
+            <!--项目开发者所属组织的URL-->    
+            <organizationUrl>http://www.javakc.com</organizationUrl>     
+        </developer>     
+    </developers>
+  	
+  	<!-- 用来设置引入jar包版本号 -->
+	<properties>
+		<!-- spring版本号 -->
+		<spring.version>5.0.4.RELEASE</spring.version>
+		<!-- mybatis版本号 -->
+		<mybatis.version>3.4.5</mybatis.version>
+		<!-- mybatis整合spring包 -->
+		<mybatis-spring.version>1.3.1</mybatis-spring.version>
+		<!-- druid数据源 -->
+		<druid.version>1.0.11</druid.version>
+		<!-- 驱动包版本 -->
+		<oracle.version>10.2.0.4.0</oracle.version>
+		<mysql.version>5.1.30</mysql.version>
+		<!-- 日志文件管理包版本 -->
+		<slf4j.version>1.7.7</slf4j.version>
+		<log4j.version>1.2.17</log4j.version>
+		<!-- shiro版本号 -->
+		<shiro.version>1.2.3</shiro.version>
+		<!-- jackson版本 -->
+		<jackson.version>2.9.4</jackson.version>
+		<!-- activiti工作流 -->
+<!-- 		<activiti.version>5.21.0</activiti.version> -->
+		<redis.version>2.9.0</redis.version>
+		<spring.data.version>2.0.6.RELEASE</spring.data.version>
+	</properties>
+  	
+  	<!-- 配置maven私服服务器 start -->
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>Team Nexus Repository</name>
+			<url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>nexus</id>
+			<name>Team Nexus Repository</name>
+			<url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+		</pluginRepository>
+	</pluginRepositories> 
+	<!-- 配置maven私服服务器 end -->
+  	
+  	<dependencies>
+  		<!-- spring核心包 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<!-- 对象关系映射：o表示object；x表示xml文件；m表示mapper映射 -->
+			<artifactId>spring-oxm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.aspectj</groupId>
+		    <artifactId>aspectjweaver</artifactId>
+		    <version>1.9.1</version>
+		</dependency>
+		<!-- mybatis核心包 -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>${mybatis.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis.caches</groupId>
+			<artifactId>mybatis-ehcache</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<!-- mybatis/spring包 -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<version>${mybatis-spring.version}</version>
+		</dependency>
+		<!-- shiro-core-spring包 -->
+        <dependency>  
+            <groupId>org.apache.shiro</groupId>  
+            <artifactId>shiro-spring</artifactId>  
+            <version>${shiro.version}</version>  
+        </dependency>  
+        <dependency>  
+            <groupId>org.apache.shiro</groupId>  
+            <artifactId>shiro-ehcache</artifactId>  
+            <version>${shiro.version}</version>  
+        </dependency>  
+        <dependency>  
+            <groupId>org.apache.shiro</groupId>  
+            <artifactId>shiro-core</artifactId>  
+            <version>${shiro.version}</version>  
+        </dependency>  
+        <dependency>  
+            <groupId>org.apache.shiro</groupId>  
+            <artifactId>shiro-web</artifactId>  
+            <version>${shiro.version}</version>  
+        </dependency>  
+<!--         <dependency>   -->
+<!--             <groupId>org.apache.shiro</groupId>   -->
+<!--             <artifactId>shiro-quartz</artifactId>   -->
+<!--             <version>${shiro.version}</version>   -->
+<!--         </dependency>  -->
+		<!-- 数据库链接 -->
+		<dependency>
+		     <groupId>com.alibaba</groupId>
+		     <artifactId>druid</artifactId>
+		     <version>${druid.version}</version>
+		</dependency>
+		<!-- 导入Mysql数据库链接jar包 -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>mysql</groupId> -->
+<!-- 			<artifactId>mysql-connector-java</artifactId> -->
+<!-- 			<version>${mysql.version}</version> -->
+<!-- 		</dependency> -->
+		<!-- 导入Oracle数据库链接jar包 -->
+<!-- 		<dependency>     -->
+<!-- 	        <groupId>com.oracle</groupId>     -->
+<!-- 	        <artifactId>ojdbc</artifactId>     -->
+<!-- 	        <version>${oracle.version}</version> -->
+<!-- 	    </dependency> -->
+	    <!-- 日志包导入 -->
+	    <dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+	    <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<!-- json解析jar包 -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.13</version>
+		</dependency>
+		<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+		</dependency>
+		<!-- apache工具类包 -->
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>3.14</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml</artifactId>
+		    <version>3.14</version>
+		</dependency>
+		
+		<!-- redis -->
+		<dependency>
+		    <groupId>org.springframework.data</groupId>
+		    <artifactId>spring-data-redis</artifactId>
+		    <version>${spring.data.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>redis.clients</groupId>
+		    <artifactId>jedis</artifactId>
+		    <version>${redis.version}</version>
+		</dependency>
+		
+		<!-- Activiti -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.activiti</groupId> -->
+<!-- 			<artifactId>activiti-engine</artifactId> -->
+<!-- 			<version>${activiti.version}</version> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.activiti</groupId> -->
+<!-- 			<artifactId>activiti-spring</artifactId> -->
+<!-- 			<version>${activiti.version}</version> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.activiti</groupId> -->
+<!-- 			<artifactId>activiti-explorer</artifactId> -->
+<!-- 			<version>${activiti.version}</version> -->
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<artifactId>vaadin</artifactId> -->
+<!-- 					<groupId>com.vaadin</groupId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<artifactId>dcharts-widget</artifactId> -->
+<!-- 					<groupId>org.vaadin.addons</groupId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<artifactId>activiti-simple-workflow</artifactId> -->
+<!-- 					<groupId>org.activiti</groupId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.activiti</groupId> -->
+<!-- 			<artifactId>activiti-modeler</artifactId> -->
+<!--             <version>${activiti.version}</version> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.activiti</groupId> -->
+<!-- 			<artifactId>activiti-diagram-rest</artifactId> -->
+<!-- 			<version>${activiti.version}</version> -->
+<!-- 		</dependency> -->
+		
+		<!-- 支持activiti缓存 -->
+		<!-- <dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-core</artifactId>
+			<version>5.1.7.Final</version>
+		</dependency> -->
+		
+	    <!-- 单元测试jar, scope=test 仅在开发模式下引入 -->
+    	<dependency>
+      		<groupId>junit</groupId>
+      		<artifactId>junit</artifactId>
+      		<version>4.12</version>
+      		<scope>test</scope>
+		</dependency>
+		<!-- servlet组件支持jar -->
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0</version>
+		</dependency>
+		<!-- JSTL标签类 -->
+		<dependency>
+			<groupId>jstl</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<!-- 导出word文档类 -->
+		<dependency>
+  			<groupId>org.freemarker</groupId>
+			<artifactId>com.springsource.freemarker</artifactId>
+			<version>2.3.18</version>
+		</dependency>
+  	</dependencies>
+  	
+	<build>
+    	<finalName>javakc</finalName>
+      	<plugins>
+			<plugin> 
+				<groupId>org.apache.maven.plugins</groupId> 
+				<artifactId>maven-compiler-plugin</artifactId> 
+				<version>2.3.2</version> 
+				<configuration> 
+				<source>1.8</source> 
+				<target>1.8</target> 
+				<encoding>UTF-8</encoding> 
+				</configuration> 
+			</plugin> 
+		</plugins>
+ 	</build>
+  	
+  	<description>
+  		javakc项目   ssm基于Maven架构的项目框架。
+		使用技术为
+		   1.Spring5.x
+		   2.SpringMvc5.x
+		   3.Mybatis3.x
+		   4.Shiro1.x
+		   5.Druid1.x
+		   6.Bootstrap ui+validate
+		   等等。。。
+	</description>
+	
+</project>

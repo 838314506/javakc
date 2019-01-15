@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhg.javakc.modules.person.dao.SubsidyDao">
+	
+	<!-- 返回结果集封装开始 -->
+	<resultMap id="subsidyMap" type="subsidy">
+		<id property="sid" column="subsy_id"/>
+		<result property="amount" column="subsy_amount"/>
+		<result property="reason" column="reason"/>
+		<result property="type" column="subsy_type"/>
+		<result property="month" column="month"/>
+		<association property="pe" javaType="person">
+			<id property="pid" column="person_id"/>
+			<result property="pname" column="person_name"/>
+			<result property="idcard" column="person_idcard"/>
+			<result property="grade" column="person_grade"/>
+		</association>
+	</resultMap>
+	<!-- 返回结果集封装结束 -->
+	
+	<sql id="all_column">
+		s.subsy_id,s.subsy_amount,s.reason,s.subsy_type,s.month
+	</sql>
+	
+	<!-- 查询某一补贴项内的所有人员的信息 -->
+	<select id="findList" resultMap="subsidyMap">
+		select <include refid="all_column"/>,p.person_id,p.person_name,p.person_idcard,p.person_grade 
+			from cadre_subsidy s left join cadre_person p
+				on s.person_id = p.person_id
+				<where>
+	               	<choose>
+	               			<when test = " null != month ">
+	               				and to_char(#{month},'yyyy-MM') = to_char(s.month,'yyyy-MM')
+	               			</when>
+	               			<otherwise>
+								and to_char(s.month,'yyyy-MM') = to_char(sysdate,'yyyy-MM')
+	               			</otherwise>
+	               	</choose>
+               	</where>
+				<if test = " null != type ">
+               		and s.subsy_type = #{type}
+				</if>
+				<if test = " null != pe ">
+					<if test = " pe.pname != null and '' != pe.pname ">
+		               	and p.person_name like '%'||#{pe.pname}||'%'
+		               	or p.person_idcard like '%'||#{pe.pname}||'%'
+					</if>
+				</if>
+	</select>
+	<!-- 通过id进行查询 -->
+	<select id="get" resultMap="subsidyMap">
+		select <include refid="all_column"/>,p.person_id,p.person_name,p.person_idcard,p.person_grade 
+			from cadre_subsidy s 
+				left join cadre_person p
+					on s.person_id = p.person_id 
+						where s.subsy_id = #{id}
+	</select>
+	<!-- 某一项目中的人员信息查询  -->
+	<select id="findAllList" resultMap="subsidyMap">
+		select p.person_id,p.person_name,p.person_idcard,p.person_grade from cadre_person p
+			<where>
+				<if test=" null != type and type == 1">
+					and p.person_eatate = 1
+				</if>
+				<if test=" null != type and type == 2">
+					and p.person_heating = 1
+				</if>
+			</where>
+			and p.person_id not in(
+             select s.person_id from cadre_subsidy s
+        	)
+	</select>
+	
+	<!-- 修改某一条数据 -->
+	<update id="update">
+		update cadre_subsidy set subsy_amount = #{amount},reason = #{reason},updateDate = #{updateDate},
+			updateuser = #{updateUser.userId} where subsy_id = #{sid}
+	</update>
+	
+	<!-- 删除数据 -->
+	<delete id="delete">
+		delete from cadre_subsidy where subsy_id in
+			<foreach collection = "array" item = "id" open = "(" close = ")" separator=",">
+				#{id}
+			</foreach>
+	</delete>
+	
+	<!-- 插入一条数据 -->
+	<insert id="insert">
+		insert into cadre_subsidy
+			(
+				subsy_id,subsy_amount,reason,subsy_type,person_id,month,createDate,createUser
+			)
+			values
+			(
+				#{sid},#{amount},#{reason},#{type},#{pe.pid},#{month},#{createDate},#{createUser.userId}
+			)
+	</insert>
+	
+	<!-- 查询某一月份某一补贴总金额 -->
+	<select id="sum" resultType="BigDecimal">
+		select sum(s.subsy_amount) from cadre_subsidy s
+				<where>
+               		<choose>
+               			<when test = " null != month ">
+               				and to_char(#{month},'yyyy-MM') = to_char(s.month,'yyyy-MM')
+               			</when>
+               			<otherwise>
+							and to_char(s.month,'yyyy-MM') = to_char(sysdate,'yyyy-MM')
+               			</otherwise>
+               		</choose>
+               		<if test = " null != type ">
+               			and s.subsy_type = #{type}
+					</if>
+				</where>
+	</select>
+</mapper>

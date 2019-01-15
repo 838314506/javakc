@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhg.javakc.modules.personnel_subsidy.dao.P_SubsidyDao">
+	
+	<!-- 结果集映射 -->
+	<resultMap id="entityId" type="p_subsidy">
+		<id property="sid" column="subsidy_id"/>
+		<result property="eb" column="subsidy_eb"/>
+		<result property="rate" column="rate"/>
+		<result property="m_amount" column="m_amount"/>
+		<result property="c_amount" column="c_amount"/>
+		<result property="reason" column="reason"/>
+		<result property="month" column="month"/>
+		<result property="type" column="type"/>
+		<result property="createDate" column="createDate"/>
+		<result property="updateDate" column="updateDate"/>
+		<association property="pe" javaType="personnel">
+			<id property="peid" column="p_id"/>
+			<result property="pename" column="p_name"/>
+			<result property="idcard" column="p_idcard"/>
+			<result property="state" column="p_state"/>
+			<result property="grade" column="p_grade"/>
+			<association property="te" javaType="te">
+				<id property="tid" column="type_id"/>
+				<result property="heating" column="heating"/>
+				<result property="eatate" column="eatate"/>
+				<result property="hi" column="hi"/>
+				<result property="car" column="car"/>
+				<result property="ei" column="ei"/>
+				<result property="unemp" column="unemp"/>
+				<result property="oa" column="oa"/>
+				<result property="oibirth" column="oibirth"/>
+			</association>
+		</association>
+	</resultMap>
+	<!-- 视图中所有字段  -->
+	<sql id="plvc">
+		p_id,p_name,p_idcard,p_state,p_grade,createid,createname,updateid,updatename,createdate,updatedate,
+			type_id,heating,eatate,hi,car,ei,unemp,oa,oibirth
+	</sql>
+	
+	<!-- 人员信息展示列表 -->
+	<sql id="p_subsidy">
+		subsidy_id,subsidy_eb,rate,m_amount,c_amount,reason,type,createdate,month,updatedate,
+		p_id,p_name,p_idcard,createid,createname,updateid,updatename,p_state,p_grade,type_id
+	</sql>
+	
+	<!-- 人员补贴信息删除 -->
+	<delete id="delete">
+		delete from personnel_subsidy where subsidy_id in
+		<foreach  collection="array" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<!-- 人员信息修改 -->
+	<update id="update">
+		update personnel_subsidy set subsidy_eb=#{eb},rate=#{rate},m_amount=#{m_amount},c_amount=#{c_amount},
+			reason=#{reason},updatedate=#{updateDate},updateuser=#{updateUser.userId}
+			where subsidy_id=#{sid}
+			
+	</update>
+	<!-- 查询人员信息列表 -->
+	<select id="findList" resultMap="entityId">
+		select subsidy_id,subsidy_eb,rate,m_amount,c_amount,createdate,month,p_id,p_name,p_idcard,p_grade,type_id
+		from p_subsidy
+		<where>
+			<if test=" type != 0 and type == 1 ">
+				and type = 1
+			</if>
+			<if test=" type != 0 and type == 2 ">
+				and type = 2
+			</if>
+			<if test=" type != 0 and type == 3 ">
+				and type = 3
+			</if>
+			<if test=" type != 0 and type == 4 ">
+				and type = 4
+			</if>
+			<if test=" type != 0 and type == 5 ">
+				and type = 5
+			</if>
+			<if test=" type != 0 and type == 6 ">
+				and type = 6
+			</if>
+			<if test=" type != 0 and type == 7 ">
+				and type = 7
+			</if>
+			<if test=" type != 0 and type == 8 ">
+				and type = 8
+			</if>
+<!-- 			<if test=" month != null and '' != month "> -->
+<!-- 				and month -->
+<!-- 			</if> -->
+			<if test = " pe != null">
+				<if test = " pe.pename != null and '' != pe.pename">
+					and p_name like '%'||#{pe.pename}||'%'
+					and idcard like '%'||#{pe.pename}||'%'
+				</if>
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询人员表中未补贴过的人员 -->
+	<select id="findAllList" resultMap="entityId">
+		select <include refid="plvc" /> from personnel_list
+			<where>
+				<if test=" type != 0 and type == 1 ">
+					and hi = 1
+				</if>
+				<if test=" type != 0 and type == 2 ">
+					and ei = 1
+				</if>
+				<if test=" type != 0 and type == 3 ">
+					and unemp = 1
+				</if>
+				<if test=" type != 0 and type == 4 ">
+					and oa = 1
+				</if>
+				<if test=" type != 0 and type == 5 ">
+					and oibirth = 1
+				</if>
+				<if test=" type != 0 and type == 6 ">
+					and eatate = 1
+				</if>
+				<if test=" type != 0 and type == 7 ">
+					and heating = 1
+				</if>
+				<if test=" type != 0 and type == 8 ">
+					and car = 1
+				</if>
+			</where>
+	</select>
+	
+	<select  id="get" resultMap="entityId">
+		select subsidy_id,subsidy_eb,rate,m_amount,c_amount,reason,type,month,p_id,p_name,p_idcard
+			,p_state,p_grade from p_subsidy where subsidy_id = #{sid}
+	</select>
+	
+	<!-- 补贴表中的字段 -->
+	<sql id="all_column">
+		subsidy_id,subsidy_eb,rate,m_amount,c_amount,reason,type,person_id,month
+	</sql>
+	<!-- 向补贴表中插入一条数据 -->
+	<insert id="insert">
+		insert into personnel_subsidy(<include refid="all_column"/>,createDate,createUser)
+			values(#{sid},#{eb},#{rate},#{m_amount},#{c_amount},#{reason},#{type},#{pe.peid},#{month},#{createDate},#{createUser.userId})
+	</insert>
+</mapper>

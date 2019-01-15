@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhg.javakc.modules.personnel.dao.PersonnelDao">
+	
+	<!-- 返回结果集封装开始 -->
+	<resultMap id="personnelMap" type="personnel">
+		<id property="peid" column="p_id"/>
+		<result property="pename" column="p_name"/>
+		<result property="idcard" column="p_idcard"/>
+		<result property="state" column="p_state"/>
+		<result property="grade" column="p_grade"/>
+		<result property="time" column="p_time"/>
+		<result property="compact" column="p_compact"/>
+		<result property="reason" column="p_reason"/>
+		<result property="createDate" column="createdate"/>
+		<result property="updateDate" column="updatedate"/>
+		<association property="te" javaType="te">
+			<id property="tid" column="type_id"/>
+			<result property="heating" column="heating"/>
+			<result property="eatate" column="eatate"/>
+			<result property="hi" column="hi"/>
+			<result property="car" column="car"/>
+			<result property="ei" column="ei"/>
+			<result property="unemp" column="unemp"/>
+			<result property="oa" column="oa"/>
+			<result property="oibirth" column="oibirth"/>
+		</association>
+		<association property="createUser" javaType="user">
+			<id property="userId" column="createid"/>
+			<result property="userName" column="createname"/>
+		</association>
+		<association property="updateUser" javaType="user">
+			<id property="userId" column="updateid"/>
+			<result property="userName" column="updatename"/>
+		</association>
+	</resultMap>
+	
+	<!-- 人员表字段 -->
+	<sql id="all_column">
+		p_id,p_name,p_idcard,p_state,p_grade,p_time,p_compact,p_reason,createuser,createdate,updateuser,
+			updatedate,type_id	
+	</sql>
+	
+	<!-- 人员补贴表字段 -->
+	<sql id="all_column_type">
+		type_id,heating,eatate,car,hi,ei,unemp,oa,oibirth
+	</sql>
+	
+	<!-- 数据库personnel_list中字段名备份，用以校验
+		p_id,p_name,p_state,p_grade,p_time,p_compact,p_reason,createid,createname,updateid,
+			updatename,createdate,updatedate,type_id,heating,eatate,hi,car,ei,unemp,oa,oibirth 
+	-->
+	<!-- 人员列表展示personnel_list_view_column字段 -->
+	<sql id="plvc">
+		p_id,p_name,p_idcard,p_state,p_grade,p_time,p_compact,p_reason,createid,createname,updateid,updatename,createdate,updatedate,
+			type_id,heating,eatate,hi,car,ei,unemp,oa,oibirth
+	</sql>
+	
+	<!-- 返回结果集封装结束 -->
+	<select id="findList" resultMap="personnelMap">
+		select <include refid="plvc" /> from personnel_list
+			<where>
+				<if test=" pename != null and '' != pename">
+					and p_name like '%'||#{pename}||'%'
+					or p_idcard like '%'||#{pename}||'%'
+				</if>
+			</where>
+	</select>
+	
+	<!-- 人员信息修改sql:
+			遇到的问题：
+				1、如果通过视图进行修改可能会受到一些约束；
+				2、如果不通过视图进行修改需要的操作将会麻烦一些，首先要通过人员的id进行查询，再通过查询出来的tid对补贴表进行修改
+						且修改时要先对人员信息表的内容进行修改，再对补贴表中的信息进行修改，且要在同一个事务中；
+				方法二：1、修改人员补贴信息的sql查询sql
+					  2、修改人员信息的sql
+		在这里那就先用视图操作吧，受到第一个约束，视图为只读，第二个不能通过视图修改联接的多个基表！
+	 -->
+	 <!-- 更新人员表中的信息 -->
+	<update id="update">
+		update cadre_personnel set p_name=#{pename},p_idcard=#{idcard},p_state=#{state},p_grade=#{grade},
+			p_time=#{time},p_compact=#{compact},p_reason=#{reason},updateuser=#{updateUser.userId},updatedate=#{updateDate}
+			 where p_id=#{peid}
+	</update>
+	
+	 <!-- 更新人员表中人员补贴的信息 -->
+	<update id="updateType">
+		update cadre_personnel_type set heating=#{te.heating},eatate=#{te.eatate},car=#{te.car},hi=#{te.hi},
+			ei=#{te.ei},unemp=#{te.unemp},oa=#{te.oa},oibirth=#{te.oibirth}
+			 where type_id=(select type_id from cadre_personnel where p_id=#{peid})
+	</update>
+	
+	<!-- 向人事处人员表中插入记录 -->
+	<insert id="insert">
+		insert into cadre_personnel (p_id,p_name,p_idcard,p_state,p_grade,p_time,p_compact,p_reason,
+			createuser,createdate,type_id) values(#{peid},#{pename},#{idcard},#{state},#{grade},#{time},
+				#{compact},#{reason},#{createUser.userId},#{createDate},#{te.tid})
+	</insert>
+	<!-- 向人事处人员表中批量插入记录 -->
+	<insert id="insertToAll">
+		insert into cadre_personnel (p_id,p_name,p_idcard,p_state,p_grade,p_time,p_compact,p_reason,
+			createuser,createdate,type_id)
+			<foreach collection="list" item="en" separator="union all">
+				select #{en.peid},#{en.pename},#{en.idcard},#{en.state},#{en.grade},#{en.time},
+				#{en.compact},#{en.reason},#{en.createUser.userId},#{en.createDate},#{en.te.tid} from dual
+			</foreach>
+	</insert>
+	
+	<!-- 向人事处人员表补贴中批量插入记录 -->
+	<insert id="insertToAllType">
+		insert into cadre_personnel_type (<include refid="all_column_type" />)
+			<foreach collection="list" item="en" separator="union all">
+				select #{en.tid},#{en.heating},#{en.eatate},#{en.car},#{en.hi},#{en.ei},#{en.unemp},
+				#{en.oa},#{en.oibirth} from dual
+			</foreach>
+	</insert>
+	
+	<!-- 向人事处人员补贴表中插入记录 -->
+	<insert id="insertType">
+		insert into cadre_personnel_type (<include refid="all_column_type" />) values(#{tid},#{heating},#{eatate},
+			#{car},#{hi},#{ei},#{unemp},#{oa},#{oibirth})
+	</insert>
+	
+	<!-- 根据人员id从视图中查询人员信息包括补贴内容 -->
+	<select id="get" resultMap="personnelMap">
+		select <include refid="plvc" /> from personnel_list where p_id = #{id }
+	</select>
+	
+	<!-- 人员信息批量删除方法 -->
+	<delete id="delete">
+		delete from cadre_personnel where p_id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+	
+</mapper>

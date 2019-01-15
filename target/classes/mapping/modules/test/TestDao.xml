@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhg.javakc.modules.test.dao.TestDao">
+	
+	<select id="findList" resultType="test">
+		SELECT TESTID, TESTNAME, TESTTIME, TESTLEVEL FROM TBL_TEST WHERE 1=1
+		<if test="testName != null and testName != ''">
+			AND TESTNAME LIKE '%'||#{testName}||'%'
+		</if>
+		ORDER BY TESTNAME DESC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO TBL_TEST(TESTID, TESTNAME, TESTTIME, TESTLEVEL) 
+			VALUES(#{testId}, #{testName}, #{testTime}, #{testLevel})
+	</insert>
+	
+	<select id="get" resultType="test">
+		SELECT TESTID, TESTNAME, TESTTIME, TESTLEVEL FROM TBL_TEST WHERE TESTID = #{id}
+	</select>
+	
+	<update id="update">
+		UPDATE TBL_TEST SET TESTNAME = #{testName}, TESTLEVEL = #{testLevel} WHERE TESTID = #{testId}
+	</update>
+	
+	<delete id="delete" parameterType="java.lang.String">  
+	    <![CDATA[
+	       DELETE FROM TBL_TEST WHERE TESTID IN 
+	    ]]>
+	    <foreach collection="array" item="id" open="(" separator="," close=")">
+	    	#{id}
+	    </foreach>
+	</delete>
+	
+	<resultMap id="empMap" type="com.zhg.javakc.modules.test.entity.EmpEntity">
+		<result property="ename" column="ename"/>
+		<result property="deptno" column="deptno"/>
+	</resultMap>
+	
+	<select id="select" statementType="CALLABLE" resultMap="empMap">
+		{call queryempbydeptno
+			(
+				#{dpt,mode=IN,jdbcType=INTEGER},
+				#{result,mode=OUT,jdbcType=CURSOR}
+			)}
+	</select>
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhg.javakc.modules.person.dao.PersonDao">
+	
+	<!-- 返回结果集封装开始 -->
+	<resultMap id="personMap" type="person">
+		<id property="pid" column="person_id"/>
+		<result property="pname" column="person_name"/>
+		<result property="idcard" column="person_idcard"/>
+		<result property="state" column="person_state"/>
+		<result property="grade" column="person_grade"/>
+		<result property="time" column="person_time"/>
+		<result property="heating" column="person_heating"/>
+		<result property="eatate" column="person_eatate"/>
+		<result property="remarks" column="remarks"/>
+		<result property="createDate" column="createDate"/>
+		<result property="updateDate" column="updateDate"/>
+		<association property="createUser" javaType="user">
+			<id property="userId" column="u1id"/>
+			<result property="userName" column="u1name"/>
+		</association>
+		<association property="updateUser" javaType="user">
+			<id property="userId" column="u2id"/>
+			<result property="userName" column="u2name"/>
+		</association>
+	</resultMap>
+	<!-- 返回结果集封装结束 -->
+	
+	<!-- 查询字段 -->
+	<sql id="all_column">
+		p.person_id,p.person_name,p.person_idcard,p.person_state,p.person_grade,p.person_time,p.person_heating,p.person_eatate,
+			p.remarks,p.createDate,p.updateDate,p.createUser,p.updateUser
+	</sql>
+	
+	<select id="findList" resultMap="personMap">
+		select <include refid="all_column"/>,u1.user_id u1id,u1.user_name u1name,u2.user_id u2id,u2.user_name u2name
+			from cadre_person p
+					left join data_user u1 on p.createuser=u1.user_id
+					left join data_user u2 on p.updateuser=u2.user_id
+			<where>
+				<if test=" null != pname and '' != pname ">
+					and p.person_name like '%'||#{pname}||'%'
+					or p.person_idcard like '%'||#{pname}||'%'
+				</if>
+			</where>
+	</select>
+	<!-- 单条新增  -->
+	<insert id="insert">
+		insert into cadre_person(person_id,person_name,person_idcard,person_state,person_grade,person_time,
+			person_heating,person_eatate,remarks,createDate,createUser) values(#{pid},#{pname},#{idcard},
+			#{state},#{grade},#{time},#{heating},#{eatate},#{remarks},#{createDate},#{createUser.userId})
+	</insert>
+	
+	<!-- 批量新增  -->
+	<insert id="insertToAll">
+		insert into cadre_person(person_id,person_name,person_idcard,person_state,person_grade,person_time,
+			person_heating,person_eatate,remarks,createDate,createUser)
+			<foreach collection="list" item="en" separator="union all">
+				select #{en.pid},#{en.pname},#{en.idcard},#{en.state},#{en.grade},#{en.time},#{en.heating},
+				#{en.eatate},#{en.remarks},#{en.createDate},#{en.createUser.userId} from dual
+			</foreach>
+	</insert>
+	
+	<!-- 按id查询单条数据  -->
+	<select id="get" resultMap="personMap">
+		select <include refid="all_column"/> from cadre_person p
+			where person_id = #{id}
+	</select>
+	
+	<!-- 修改数据  -->
+	<update id="update">
+		update cadre_person set person_name=#{pname},person_idcard=#{idcard},person_state=#{state},
+			person_grade=#{grade},person_time=#{time},person_heating=#{heating},person_eatate=#{eatate},
+				remarks=#{remarks},updateDate=#{updateDate},updateUser=#{updateUser.userId} 
+					where person_id=#{pid}
+	</update>
+	
+	<!-- 删除数据  -->
+	<delete id="delete">
+		delete from cadre_person where person_id in
+			<foreach collection="array" item="id" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+	</delete>
+</mapper>
